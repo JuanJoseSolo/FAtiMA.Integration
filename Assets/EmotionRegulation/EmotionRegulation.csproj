@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Components\AutobiographicMemory\AutobiographicMemory.csproj" />
+    <ProjectReference Include="..\..\Components\WellFormedNames\WellFormedNames.csproj" />
+    <ProjectReference Include="..\EmotionalAppraisal\EmotionalAppraisal.csproj" />
+    <ProjectReference Include="..\EmotionalDecisionMaking\EmotionalDecisionMaking.csproj" />
+    <ProjectReference Include="..\IntegratedAuthoringTool\IntegratedAuthoringTool.csproj" />
+    <ProjectReference Include="..\RolePlayCharacter\RolePlayCharacter.csproj" />
+  </ItemGroup>
+
+	<ItemGroup>
+    <Reference Include="FLS">
+      <HintPath>bin\Plugins\FLS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ScottPlot" Version="4.1.33" />
+    <PackageReference Include="SpreadsheetLight" Version="3.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Assets\EmotionalDecisionMaking\EmotionalDecisionMaking.csproj" />
+    <ProjectReference Include="..\..\Assets\RolePlayCharacter\RolePlayCharacter.csproj" />
+    <ProjectReference Include="..\..\Components\ActionLibrary\ActionLibrary.csproj" />
+    <ProjectReference Include="..\..\Components\AutobiographicMemory\AutobiographicMemory.csproj" />
+    <ProjectReference Include="..\..\Components\GAIPS.Rage\GAIPS.Rage.csproj" />
+    <ProjectReference Include="..\..\Components\KnowledgeBase\KnowledgeBase.csproj" />
+    <ProjectReference Include="..\..\Components\WellFormedNames\WellFormedNames.csproj" />
+    <ProjectReference Include="..\EmotionalAppraisalTutorial\EmotionalAppraisalTutorial.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="EmotionRegulation">
+      <HintPath>..\..\Assets\EmotionRegulation\bin\Debug\netstandard2.0\EmotionRegulation.dll</HintPath>
+    </Reference>
+    <Reference Include="FLS">
+      <HintPath>..\..\Assets\EmotionRegulation\bin\Plugins\FLS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

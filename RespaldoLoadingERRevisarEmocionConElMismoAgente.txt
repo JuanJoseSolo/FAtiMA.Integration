@@ -1,0 +1,122 @@
+ var holdingMood = _rpc.Mood;
+            var holdingEmotions = _rpc.GetAllActiveEmotions().OrderBy(x => x.CauseEventId).ToList();
+            
+            var oldlastEmotion = holdingEmotions.LastOrDefault(); ///Si es null significa que no hay emociones previas.
+
+            var eventName = EventHelper.ActionEnd(_rpc.CharacterName, decision.Name, decision.Target);
+            _rpc.Perceive(eventName);
+            var emotions = _rpc.GetAllActiveEmotions().OrderBy(x=>x.CauseEventId).ToList();
+
+            if (emotions.Count() == 0) return false;
+
+            var newLastEmotion = emotions.LastOrDefault();
+
+            if (oldlastEmotion is null)
+            {
+                ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+                /// Si entra aquí significa que las nuevas emociones generadas son debido al evento que se está 
+                /// analizando.
+                ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+                
+                _rpc.Mood = holdingMood; // Recuperamos el antiguo mood.
+                foreach (var emotion in emotions) // Buscamos si existe una emoción negativa ocacionada por el evento.
+                {
+                    var OCCemotion = OCCEmotionType.Parse(emotion.Type);
+                    var appVarOfEmotion = OCCemotion.AppraisalVariables;
+                    var valence = OCCEmotionType.Parse(emotion.Type).Valence;
+                    if (valence.Equals(EmotionValence.Negative))
+                    {
+                        ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+                        /// Si entra aquí significa que las nuevas emociones generadas tienen una valencia negativa, por 
+                        /// lo tanto se procede cargar la información necesaria para iniciar con el proceso de regulación.
+                        ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+                        
+                        requiredData = baseAgent.RequiredData;
+                        if (CheckDataInformation(decision.Name, IsSpeak))
+                        {
+                            // Se verifica que existan datos para poder regualar la emoción ocacionda por el evento.
+
+                            this.baseAgent = baseAgent;
+                            EventMatchingTemplate = AppraisalRulesOfEvent.Select(evt => evt.EventMatchingTemplate).First();
+                            EmotionInformation emoInfo = new EmotionInformation();
+                            var specificAppVar = new List<AppraisalVariableDTO>();
+                            foreach (var app in appVarOfEmotion)
+                            {
+                                specificAppVar.Add(AppraisalRulesOfEvent.Select(v => v.AppraisalVariables.appraisalVariables.Find(v1 =>
+                                v1.Name == app)).FirstOrDefault());
+                            }
+                            emoInfo.SpecificAppVariables = specificAppVar;
+                            emoInfo.EmotionDTO = emotion;
+                            emoInfo.OCCEmotionType = OCCemotion;
+                            emoInfo.CopySpecificAppraisalVariables();
+                            EmotionInformation = emoInfo;
+
+                            AnyNegativeEmotion = true;
+                        }
+                    }
+
+                    _rpc.RemoveEmotion(emotion);
+                }
+                _rpc.ForgetEvent(newLastEmotion.CauseEventId);
+            }
+            else
+            {
+                ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+                /// Sí entra aquí quiere decir que ya existian emociones previas al evento que se está analizando, 
+                /// por lo que hay que buscar cuáles son.
+                ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+
+
+                /// Solo recuperamos las emocines que fueron probocadas por el evento actual.
+                var newEmotions = holdingEmotions.Where(e => e.CauseEventId != oldlastEmotion.CauseEventId).ToList();
+                if (newEmotions.Count() == 0)
+                    newEmotions.Add(newLastEmotion);
+                //hasta aquí es diferente
+                _rpc.Mood = holdingMood; // Recuperamos el antiguo mood.
+                foreach (var emotion in newEmotions) // Buscamos si existe una emoción negativa ocacionada por el evento.
+                {
+                    var OCCemotion = OCCEmotionType.Parse(emotion.Type);
+                    var appVarOfEmotion = OCCemotion.AppraisalVariables; // Una emoción puede estár constituida por más de una variable de valoración.
+                    var valence = OCCEmotionType.Parse(emotion.Type).Valence;
+                    if (valence.Equals(EmotionValence.Negative))
+                    {
+
+                        ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+                        /// Si entra aquí significa que las nuevas emociones generadas tienen una valencia negativa, por 
+                        /// lo tanto se procede cargar la información necesaria para iniciar con el proceso de regulación.
+                        ///-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+
+
+                        requiredData = baseAgent.RequiredData;
+                        if (CheckDataInformation(decision.Name, IsSpeak)) 
+                        {
+                            // Se verifica que existan datos para poder regualar la emoción ocacionda por el evento y se
+                            // carga la información necesaria.
+                            
+                            this.baseAgent = baseAgent;
+                            EventMatchingTemplate = AppraisalRulesOfEvent.Select(evt => evt.EventMatchingTemplate).First();
+                            var currentStateOfDialog = decision.Parameters;
+                            string utterance = null;
+                            DialogOfEvent = requiredData.IAT_FAtiMA.GetDialogAction(decision, out utterance);
+                            EventMatchingTemplate = AppraisalRulesOfEvent.Select(evt => evt.EventMatchingTemplate).First();
+                            EmotionInformation emoInfo = new EmotionInformation();
+                            var specificAppVar = new List<AppraisalVariableDTO>();
+                            foreach (var app in appVarOfEmotion)
+                            {
+                                specificAppVar.Add(AppraisalRulesOfEvent.Select(v => v.AppraisalVariables.appraisalVariables.Find(v1 =>
+                                v1.Name == app)).FirstOrDefault());
+                            }
+                            emoInfo.SpecificAppVariables = specificAppVar;
+                            emoInfo.EmotionDTO = emotion;
+                            emoInfo.OCCEmotionType = OCCemotion;
+                            emoInfo.CopySpecificAppraisalVariables();
+                            EmotionInformation = emoInfo;
+
+                            AnyNegativeEmotion = true;
+                        }
+                    }
+
+                    _rpc.RemoveEmotion(emotion);
+                }
+                _rpc.ForgetEvent(newLastEmotion.CauseEventId);
+
+            }
