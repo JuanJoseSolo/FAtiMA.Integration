@@ -75,6 +75,11 @@ namespace EmotionRegulationTest01
 
             //suponiendo que del asset iat, se recupera la info de un agente específico. en este caso, el agente que estamos
             //creando via código.
+	    //
+	    //This is the first time for the new thing using FAtiMA, in this aproach, we will do something different using the newes 
+	    //adding new comments as you mentioned, this is the new form to do the scpecific thing and other thing that I want to say
+	    //is how we add the new information, as you know this is the other things that.....
+	    //
 
 
             var AppRuleCrash = SetAppRules(OCCAppraisalVariables.DESIRABILITY, (Name)"-5", (Name)"-", Crash);
